@@ -10,13 +10,13 @@
 #define TAX_RATE 0.08
 #define SERVICE_CHARGE 0.10
 
-// Structure definitions
+//////////////////////////////////////////////////////////////   Structure definitions  ///////////////////////////////////////////////////////////////////////////////////
 typedef struct {
     int id;
     char name[MAX_NAME_LENGTH];
     float price;
     char category[MAX_NAME_LENGTH];
-    int preparation_time; // in minutes
+    int preparation_time; ///////////////////////////////////////    in minutes
 } menu_item;
 
 typedef struct {
@@ -28,11 +28,11 @@ typedef struct {
 typedef struct {
     int order_id;
     int table_number;
-    char order_type[20]; // "dine-in", "takeaway"
+    char order_type[20]; //////////////////////////////////////////// "dine-in", "takeaway"     ////////////////////////////////////////////////////////////////////////////
     time_t order_time;
     order_item items[MAX_ORDER_ITEMS];
     int item_count;
-    char status[20]; // "pending", "preparing", "ready", "served", "cancelled"
+    char status[20]; /////////////////////////////////////////////////// "pending", "preparing", "ready", "served", "cancelled"
     float total_amount;
     float tax;
     float service_charge;
@@ -47,17 +47,17 @@ typedef struct {
     int order_count;
     int next_order_id;
     
-    // Kitchen queue pointers
+    ////////////////////////////////////////////////////////////////////////      Kitchen queue pointers //////////////////////////////////////////////////////////////////////////////
     order* kitchen_queue[MAX_ORDERS];
     int kitchen_front;
     int kitchen_rear;
     
-    // Statistics
+    // //////////////////////////////////////////////////////////////////////////////      Statistics  ////////////////////////////////////////////////////////////////////
     float daily_revenue;
-    int order_frequency[24]; // orders per hour
+    int order_frequency[24]; //////////////////////////////////////////////////////////////////////////////// orders per hour     ////////////////////////////////////////
 } Restaurant;
 
-// Function prototypes
+//////////////////////////////////////////////////////////////////////////////// Function prototypes//////////////////////////////////////////////////////////////////////////////
 void initialize_restaurant(Restaurant* rest);
 void add_menu_item(Restaurant* rest, int id, char* name, float price, char* category, int prep_time);
 void display_menu(Restaurant* rest);
@@ -72,13 +72,13 @@ void generate_reports(Restaurant* rest);
 void bubble_sort_orders_by_time(order arr[], int n);
 int binary_search_order(Restaurant* rest, int order_id);
 
-// Queue operations
+//////////////////////////////////////////////////////////////////////////////// Queue operations. //////////////////////////////////////////////////////////////////////////////
 void enqueue_kitchen(Restaurant* rest, order* order);
 order* dequeue_kitchen(Restaurant* rest);
 int is_kitchen_queue_empty(Restaurant* rest);
 int is_kitchen_queue_full(Restaurant* rest);
 
-// Utility functions
+//////////////////////////////////////////////////////////////////////////////// Utility functions  //////////////////////////////////////////////////////////////////////////////
 int find_menu_item_by_id(Restaurant* rest, int id);
 int find_order_by_id(Restaurant* rest, int id);
 void get_current_time_string(char* buffer);
@@ -87,7 +87,8 @@ int main() {
     Restaurant my_restaurant;
     initialize_restaurant(&my_restaurant);
     
-    // Sample menu items
+    //////////////////////////////////////////////////////////////////////////////// Sample menu items  //////////////////////////////////////////////////////////////////////////////
+
     add_menu_item(&my_restaurant, 1, "Margherita Pizza", 12.99, "Main Course", 15);
     add_menu_item(&my_restaurant, 2, "Caesar Salad", 8.99, "Appetizer", 10);
     add_menu_item(&my_restaurant, 3, "Grilled Salmon", 18.99, "Main Course", 20);
@@ -95,7 +96,7 @@ int main() {
     add_menu_item(&my_restaurant, 5, "Iced Tea", 2.99, "Beverage", 2);
     add_menu_item(&my_restaurant, 6, "Garlic Bread", 4.99, "Appetizer", 8);
     
-    // Add 100+ menu items
+    //////////////////////////////////////////////////////////////////////////////// Add 100+ menu items    //////////////////////////////////////////////////////////////////////////////
     add_menu_item(&my_restaurant, 7, "Pepperoni Pizza", 14.99, "Main Course", 15);
     add_menu_item(&my_restaurant, 8, "Veggie Burger", 10.99, "Main Course", 12);
     add_menu_item(&my_restaurant, 9, "Chicken Wings", 11.99, "Appetizer", 15);
@@ -345,13 +346,13 @@ int place_order(Restaurant* rest, int table_num, char* order_type) {
     strcpy(new_order->status, "pending");
     new_order->total_amount = 0.0;
     
-    // Record order hour for frequency analysis
+    //////////////////////////////////////////////////////////////////////////////// Record order hour for frequency analysis//////////////////////////////////////////////////////////////////////////////
     struct tm* timeinfo = localtime(&new_order->order_time);
     rest->order_frequency[timeinfo->tm_hour]++;
     
     rest->order_count++;
     
-    // Add items to order
+    //////////////////////////////////////////////////////////////////////////////// Add items to order
     int add_more = 1;
     while(add_more && new_order->item_count < MAX_ORDER_ITEMS) {
         int menu_id, quantity;
@@ -369,7 +370,7 @@ int place_order(Restaurant* rest, int table_num, char* order_type) {
         scanf("%d", &add_more);
     }
     
-    // Add to kitchen queue
+    //////////////////////////////////////////////////////////////////////////////// Add to kitchen queue
     enqueue_kitchen(rest, new_order);
     
     return new_order->order_id;
@@ -420,7 +421,7 @@ void update_order_status(Restaurant* rest, int order_id, char* new_status) {
     
     printf("order %d status updated to: %s\n", order_id, new_status);
     
-    // If order is served, calculate final bill and update revenue
+    //////////////////////////////////////////////////////////////////////////////// If order is served calculate final bill and update revenue
     if(strcmp(new_status, "served") == 0) {
         calculate_bill(rest, order_id);
         rest->daily_revenue += order->final_total;
@@ -444,8 +445,8 @@ void cancel_order(Restaurant* rest, int order_id) {
     strcpy(order->status, "cancelled");
     printf("order %d has been cancelled.\n", order_id);
     
-    // Remove from kitchen queue if present
-    // This is a simplified approach - in real scenario would need proper queue removal
+    //////////////////////////////////////////////////////////////////////////////// Remove from kitchen queue if present   //////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////// This is a simplified approach - in real scenario would need proper queue removal
 }
 
 void calculate_bill(Restaurant* rest, int order_id) {
@@ -511,14 +512,14 @@ void process_kitchen_queue(Restaurant* rest) {
         return;
     }
     
-    // Process orders in queue
+    /////////////////////////////////////////////////////   Process orders in queue  /////////////////////////////////////////////////////////////////////////////////////
     while(!is_kitchen_queue_empty(rest)) {
         order* order = dequeue_kitchen(rest);
         if(order && strcmp(order->status, "cancelled") != 0) {
             printf("Processing order %d (Table %d) - Status: %s\n", 
                    order->order_id, order->table_number, order->status);
             
-            // Simulate kitchen processing
+            //////////////////////////////////////////////////////////////////////////////// Simulate kitchen processing /////////////////////////
             if(strcmp(order->status, "pending") == 0) {
                 update_order_status(rest, order->order_id, "preparing");
                 printf("order %d is now being prepared.\n", order->order_id);
@@ -533,10 +534,10 @@ void process_kitchen_queue(Restaurant* rest) {
 void generate_reports(Restaurant* rest) {
     printf("\n=== RESTAURANT REPORTS ===\n");
     
-    // Daily Revenue
+    //////////////////////////////////////////////////////////////////////////////// Daily revenue  /////////////////////////////////////////////////////////
     printf("Daily Revenue: $%.2f\n", rest->daily_revenue);
     
-    // Busiest Hours
+    //////////////////////////////////////////////////////////////////////////////// Busiest hours//////////////////////////////////////////////////////////////////////////////
     printf("\nBusiest Hours Analysis:\n");
     int max_orders = 0;
     for(int i = 0; i < 24; i++) {
@@ -551,7 +552,7 @@ void generate_reports(Restaurant* rest) {
         }
     }
     
-    // Most ordered items
+    //////////////////////////////////////////////////////////////////////////////// Most ordered items
     printf("\nMost Ordered Items:\n");
     int item_frequency[MAX_MENU_ITEMS] = {0};
     
@@ -563,16 +564,16 @@ void generate_reports(Restaurant* rest) {
         }
     }
     
-    // Simple bubble sort to find top items
+    //////////////////////////////////////////////////////////////////////////////// Simple bubble sort to find top items
     for(int i = 0; i < rest->menu_count - 1; i++) {
         for(int j = 0; j < rest->menu_count - i - 1; j++) {
             if(item_frequency[j] < item_frequency[j + 1]) {
-                // Swap frequencies
+                //////////////////////////////////////////////////////////////////////////////// Swap frequencies
                 int temp_freq = item_frequency[j];
                 item_frequency[j] = item_frequency[j + 1];
                 item_frequency[j + 1] = temp_freq;
                 
-                // Swap menu items
+                //////////////////////////////////////////////////////////////////////////////// Swap menu items
                 menu_item temp_item = rest->menu_items[j];
                 rest->menu_items[j] = rest->menu_items[j + 1];
                 rest->menu_items[j + 1] = temp_item;
@@ -589,7 +590,7 @@ void generate_reports(Restaurant* rest) {
     }
 }
 
-// Queue Implementation
+//////////////////////////////////////////////////////////////////////////////// Queue implementation
 void enqueue_kitchen(Restaurant* rest, order* order) {
     if(is_kitchen_queue_full(rest)) {
         printf("Kitchen queue is full!\n");
@@ -618,7 +619,7 @@ int is_kitchen_queue_full(Restaurant* rest) {
     return (rest->kitchen_rear + 2) % MAX_ORDERS == rest->kitchen_front;
 }
 
-// Utility Functions
+/////////////////////////////////////////////////////////////////////////////// Utility functions
 int find_menu_item_by_id(Restaurant* rest, int id) {
     for(int i = 0; i < rest->menu_count; i++) {
         if(rest->menu_items[i].id == id) {
@@ -643,7 +644,7 @@ void get_current_time_string(char* buffer) {
     strftime(buffer, 30, "%Y-%m-%d %H:%M:%S", timeinfo);
 }
 
-// Sorting and Searching (for future enhancements)
+//////////////////////////////////////////////////////////////////////////////// Sorting and searching  //////////////////////////////////////////////////////////////////////////////
 void bubble_sort_orders_by_time(order arr[], int n) {
     for(int i = 0; i < n-1; i++) {
         for(int j = 0; j < n-i-1; j++) {
